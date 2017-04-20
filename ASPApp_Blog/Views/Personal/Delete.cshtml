@@ -1,0 +1,19 @@
+﻿@model ASPApp_Blog.Models.User
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<body>
+<h4>@Model.Name , are you sure you want to delete your account?</h4>
+
+@using (Html.BeginForm("DeleteConfirm","Personal", new { id=Model.ID},FormMethod.Post))
+{
+    <p>
+        <input type="submit" value="Delete" /> 
+    </p>
+    <b>@Html.ActionLink("Back to My Page", "PersonalPage", new { id = Model.ID })</b>
+
+}
+
+
+</body>

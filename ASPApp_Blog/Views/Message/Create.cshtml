@@ -1,0 +1,27 @@
+﻿@model ASPApp_Blog.Models.User
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<body>
+
+    @using (Html.BeginForm("CreateMessage", "Message", FormMethod.Post))
+    {
+       
+        <fieldset>
+            @Html.HiddenFor(model => model.ID)
+            <p></p>
+            <p>To user </p>
+            @Html.TextBox("Login")
+            @Html.ValidationMessageFor(model => model.Login)
+            <p></p>
+            <p>Text :</p>
+            @Html.TextArea("Text")
+            <p></p>
+            <p><input type="submit" value="Sign in" /></p>
+        </fieldset>
+    }
+
+</body>
+

@@ -1,0 +1,32 @@
+﻿@model ASPApp_Blog.Models.User
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<html>
+
+<body>
+    <div>
+        <h3>Welcome to MyBlog</h3>
+        @using (Html.BeginForm("Enter", "Home", FormMethod.Post))
+        {
+            @Html.ValidationSummary(true)
+
+            <p>Enter your login: </p>
+            @Html.TextBox("Login")
+            @Html.ValidationMessageFor(model => model.Login)
+            <p></p>
+            <p>Enter your password :</p>
+            @Html.Password("Password")
+            @Html.ValidationMessageFor(model => model.Password)
+            <p></p>
+            <p><input type="submit" value="Sign in" /></p>
+        }
+
+        @Html.ActionLink("Registration", "Registration", "Personal")
+
+    </div>
+</body>
+</html>
+
