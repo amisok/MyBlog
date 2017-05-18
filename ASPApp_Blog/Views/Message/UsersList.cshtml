@@ -1,0 +1,27 @@
+﻿@model ASPApp_Blog.ViewModels.MessageUsersViewModel
+@{
+    ViewBag.Title = "Users List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Users</h3>
+
+<body>
+    <table >
+       
+        @foreach (var item in Model.Users)
+        {
+            <tr>
+                <td width="150px">
+                   <p> @Html.DisplayFor(modelItem => item.Name)  @Html.DisplayFor(modelItem => item.Surname)   </p>
+                </td>
+               
+                <td >
+                      @Html.ActionLink("Send message", "Create", new { userFromID = Model.SenderID, userToID=item.ID })
+                </td>
+            </tr>
+        }
+    </table>
+
+</body>
+

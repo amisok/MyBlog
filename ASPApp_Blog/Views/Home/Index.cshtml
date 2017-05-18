@@ -1,4 +1,4 @@
-﻿@model ASPApp_Blog.Models.User
+﻿@model ASPApp_Blog.ViewModels.IndexViewModel
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -15,7 +15,7 @@
 
             <p>Enter your login: </p>
             @Html.TextBox("Login")
-            @Html.ValidationMessageFor(model => model.Login)
+            @Html.ValidationMessageFor(Model => Model.Login)
             <p></p>
             <p>Enter your password :</p>
             @Html.Password("Password")

@@ -9,6 +9,8 @@ namespace ASPApp_Blog.Models
     {
         public int ID { get; set; }
         
+
+        public virtual User UserFrom { get; set; }
         public virtual Message Message { get; set; }
         public virtual User UserTo { get; set; }
        

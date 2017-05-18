@@ -1,22 +1,31 @@
-﻿@model ASPApp_Blog.Models.User
+﻿@model ASPApp_Blog.ViewModels.CreateMessageViewModel
 @{
     ViewBag.Title = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@section styles
+{
 
+    <style>
+        
+        #line {
+            font-size: 16px;
+         }
+    </style>
+}
 <body>
 
     @using (Html.BeginForm("CreateMessage", "Message", FormMethod.Post))
     {
        
         <fieldset>
-            @Html.HiddenFor(model => model.ID)
+            @Html.HiddenFor(model => model.UserFromID)
+            @Html.HiddenFor(model => model.UserToID)
             <p></p>
-            <p>To user </p>
-            @Html.TextBox("Login")
-            @Html.ValidationMessageFor(model => model.Login)
+            <p id="line"><b>To user</b> </p>
+            @Html.DisplayFor(model=>model.UserToName)  @Html.DisplayFor(model => model.UserToSurname)
             <p></p>
-            <p>Text :</p>
+            <p id="line"><b>Text :</b></p>
             @Html.TextArea("Text")
             <p></p>
             <p><input type="submit" value="Sign in" /></p>

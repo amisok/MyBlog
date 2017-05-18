@@ -1,4 +1,4 @@
-﻿@model ASPApp_Blog.Models.User
+﻿@model ASPApp_Blog.ViewModels.PersonalPageViewModel
 @{
     ViewBag.Title = "PersonalPage";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -48,7 +48,7 @@
     <div>
         <div class="blok1">
             <img class="picture"
-                 src="../images/picture.jpg"
+                 src="~/images/picture.jpg"
                  align="middle" width=140 height=140
                  alt="picture" />
 
@@ -61,13 +61,13 @@
             <b><i>@Html.ActionLink("Edit personal data", "Edit", "Personal", new { id = Model.ID }, null)</i></b>
             <p></p>
             <p></p>
-            <b><i>@Html.ActionLink("New message", "Create", "Message", new { id = Model.ID }, null)</i></b>
+            <b><i>@Html.ActionLink("New message", "UsersList", "Message", new { id = Model.ID }, null)</i></b>
             
         </div>
         <div class="blok2">
-            <h4>All Messages</h4>
+            <h4>Input messages:</h4>
             <p></p>
-            @foreach (var item in ViewBag.MyMessages)
+            @foreach (var item in Model.InputMessages)
             {
                 <p id="text"><i>@item.Text</i></p>
                 <p></p>
@@ -75,6 +75,17 @@
                 <p></p>
                 <p></p>
             }
+            <h4>Output messages:</h4>
+            <p></p>
+            @foreach (var item in Model.OutputMessages)
+            {
+                <p id="text"><i>@item.Text</i></p>
+                <p></p>
+                <p id="time"><b><i>@item.CreationTime.ToString()</i></b></p>
+                <p></p>
+                <p></p>
+            }
+
         </div>
     </div>
 </body>

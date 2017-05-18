@@ -1,4 +1,5 @@
 ﻿using ASPApp_Blog.Models;
+using ASPApp_Blog.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,28 +11,11 @@ namespace ASPApp_Blog.Controllers
     public class MessageController : Controller
     {
         [HttpGet]
-        public ActionResult Create(int id=0)
+        public ActionResult UsersList(int id = 0)
         {
-            using(BlogContext db = new BlogContext())
-            {
-                User user = db.Users.Find(id);
-                if (user == null)
-                {
-                    return HttpNotFound();
-                }
-                return View(user);
-            }
+            MessageUsersViewModel forMessage = new MessageUsersViewModel();
             
-        }
-        [HttpPost]
-        public ActionResult CreateMessage( string login, string text, int id=0)
-        {
-            string[] logins = login.Split(new string[] { ",", ", "},StringSplitOptions.RemoveEmptyEntries);
 
-            Message message = new Message();
-            message.CreationTime = DateTime.Now;
-            message.Text = text;
-            MessageToUser messageToUser = new MessageToUser();
             using (BlogContext db = new BlogContext())
             {
                 User user = db.Users.Find(id);
@@ -39,26 +23,73 @@ namespace ASPApp_Blog.Controllers
                 {
                     return HttpNotFound();
                 }
-                message.UserFrom = user;
-                db.Messages.Add(message);
-                messageToUser.Message = message;
-
-                foreach (string item in logins)
+                forMessage.SenderID = user.ID;
+                foreach (var item in db.Users)
                 {
-                    try
+                    if (item.ID!=user.ID)
                     {
-                        messageToUser.UserTo = db.Users.Where(u => u.Login == item).Single();
+                        UserForMessage userForMessage = new UserForMessage();
+                        userForMessage.ID = item.ID;
+                        userForMessage.Name = item.Name;
+                        userForMessage.Surname = item.Surname;
+                        forMessage.Users.Add(userForMessage);
                     }
-                    catch(Exception)
-                    {
-                       ModelState.AddModelError("Login", "Unknown user");
-                       return View("Create", user);
-                    }
-                    db.MessageToUsers.Add(messageToUser);
-                    db.SaveChanges();
                 }
+                return View(forMessage);
             }
-            return RedirectToAction("PersonalPage", "Personal", new { id=id});
+
+        }
+
+
+
+        [HttpGet]
+        public ActionResult Create(int userFromID, int userToID)
+        {
+            CreateMessageViewModel model = new CreateMessageViewModel();
+            using (BlogContext db = new BlogContext())
+            {
+                User userFrom = db.Users.Find(userFromID);
+                User userTo = db.Users.Find(userToID);
+                if (userFrom == null||userTo==null)
+                {
+                    return HttpNotFound();
+                }
+                
+                model.UserFromID = userFrom.ID;
+                model.UserToID = userTo.ID;
+                model.UserToName = userTo.Name;
+                model.UserToSurname = userTo.Surname;
+                return View(model);
+            }
+            
+        }
+        [HttpPost]
+        public ActionResult CreateMessage( int userFromID, int userToID, string text)
+        {
+
+
+            Message message = new Message();
+            message.CreationTime = DateTime.Now;
+            message.Text = text;
+            MessageToUser messageToUser = new MessageToUser();
+            using (BlogContext db = new BlogContext())
+            {
+                User sender = db.Users.Find(userFromID);
+                User userTo = db.Users.Find(userToID);
+                if (sender == null||userTo==null)
+                {
+                    return HttpNotFound();
+                }
+                
+                db.Messages.Add(message);
+                messageToUser.UserFrom = sender;
+                messageToUser.UserTo = userTo;
+                messageToUser.Message = message;
+                db.MessageToUsers.Add(messageToUser);
+                db.SaveChanges();
+
+            }
+            return RedirectToAction("PersonalPage", "Personal", new { id = userFromID });
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ASPApp_Blog.Models;
+using ASPApp_Blog.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -17,16 +18,16 @@ namespace ASPApp_Blog.Controllers
         
 
         [HttpPost]
-        public ActionResult Enter(string login, string password)
+        public ActionResult Enter(IndexViewModel model)
         {
            
             using (BlogContext db = new BlogContext())
             {
                 foreach (User u in db.Users)
                 {
-                    if (u.Login==login)
+                    if (u.Login==model.Login)
                     {
-                        if (u.Password == password)
+                        if (u.Password == model.Password)
                         {
                            
                             return RedirectToAction("PersonalPage", "Personal", new { id = u.ID });

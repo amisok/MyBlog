@@ -1,11 +1,12 @@
 ﻿using ASPApp_Blog.Models;
+using ASPApp_Blog.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
+using System. Web.Security;
 
 namespace ASPApp_Blog.Controllers
 {
@@ -14,29 +15,30 @@ namespace ASPApp_Blog.Controllers
         [HttpGet]
         public ActionResult Registration()
         {
+
             return View();
         }
 
         [HttpPost]
-        public ActionResult Registration(User user)
+        public ActionResult Registration(UserViewModel model)
         {
-
-            CheckField(user);
+            CheckField(model);
             using (BlogContext db = new BlogContext())
             {
-                user.CreationTime = DateTime.Now;
                 if (ModelState.IsValid)
                 {
+                    User user = ModelToUser(model);
+                    user.CreationTime = DateTime.Now;
                     db.Users.Add(user);
                     db.SaveChanges();
-                    return RedirectToAction("PersonalPage", user);
+                    return RedirectToAction("PersonalPage", new { id = user.ID });
 
                 }
 
-                return View(user);
+                return View(model);
             }
         }
-       
+
         public ActionResult PersonalPage(int id)
         {
             User user = FindReturnUser(id);
@@ -44,27 +46,8 @@ namespace ASPApp_Blog.Controllers
             {
                 return HttpNotFound();
             }
-           FindMessages(user);
-            return View(user);
-        }
-
-        public void FindMessages(User user)
-        {
-           
-            List<Message> myMessages = new List<Message>();
-           
-            using (BlogContext db = new BlogContext())
-            {
-                foreach (var item in db.Messages)
-                {
-                    
-                        myMessages.Add(item);
-                  
-                    
-                }  
-            }
-            ViewBag.MyMessages = myMessages;
-           
+            PersonalPageViewModel model = UserToPersonalModel(user);
+            return View(model);
         }
 
         [HttpGet]
@@ -75,27 +58,30 @@ namespace ASPApp_Blog.Controllers
             {
                 return HttpNotFound();
             }
-            return View(user);
+            UserViewModel model = UserToModel(user);
+            return View(model);
         }
 
         [HttpPost]
-        public ActionResult Edit(User user)
+        public ActionResult Edit(UserViewModel model)
         {
-            CheckField(user);
-            using (BlogContext db=new BlogContext())
+            
+            CheckField(model);
+            using (BlogContext db = new BlogContext())
             {
                 if (ModelState.IsValid)
                 {
+                    User user = ModelToUser(model);
                     db.Entry(user).State = EntityState.Modified;
                     db.SaveChanges();
-                    return RedirectToAction("PersonalPage",user);
-                    
+                    return RedirectToAction("PersonalPage", new { id = user.ID });
+
                 }
-               
-                return View(user);
+
+                return View(model);
             }
         }
-        
+
         [HttpGet]
         public ActionResult Delete(int id = 0)
         {
@@ -104,7 +90,9 @@ namespace ASPApp_Blog.Controllers
             {
                 return HttpNotFound();
             }
-            return View(user);
+
+            DeleteUserViewModel model = UserToDeleteModel(user);
+            return View(model);
         }
 
 
@@ -119,27 +107,18 @@ namespace ASPApp_Blog.Controllers
                     return HttpNotFound();
                 }
 
+                var msg = db.MessageToUsers
+                            .Where(m => m.UserFrom.ID == user.ID || m.UserTo.ID == user.ID)
+                            .Select(m=>m);
 
-                //TODO: Rewrite
-                foreach (var msg in db.Messages)
+                foreach (var item in msg)
                 {
-                    if (msg.UserFrom == user)
-                    {
-
-                        foreach (var msgTo in db.MessageToUsers)
-                        {
-                            if (msg == msgTo.Message)
-                            {
-                                db.MessageToUsers.Remove(msgTo);
-                            }
-                        }
-                        db.Messages.Remove(msg);
-                    }
+                    db.Messages.Remove(item.Message);
+                    db.MessageToUsers.Remove(item);
                 }
-
                 db.Users.Remove(user);
                 db.SaveChanges();
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index", "Home");
             }
         }
 
@@ -153,38 +132,137 @@ namespace ASPApp_Blog.Controllers
             }
         }
 
-        public void CheckField(User user)
+        public void CheckField(UserViewModel model)
         {
             using (BlogContext db = new BlogContext())
             {
-                foreach (User item in db.Users)
+                
+                if (db.Users.Where(u => u.ID != model.ID && u.Login == model.Login)
+                            .Select(u => u)
+                            .Count()>0)
                 {
-                    if (user.ID != item.ID)
+                    ModelState.AddModelError("Login", "This login already exists");
+                    return;
+                }
+
+                if (db.Users.Where(u => u.ID != model.ID && u.Email == model.Email)
+                            .Select(u => u)
+                            .Count()>0)
+                {
+                    ModelState.AddModelError("Email", "This e-mail already exists");
+                    return;
+                }
+
+            }
+
+        }
+
+        public User ModelToUser(UserViewModel model)
+        {
+            User user = new User();
+            user.Age = model.Age;
+            user.Name = model.Name;
+            user.Login = model.Login;
+            user.Surname = model.Surname;
+            user.Password = model.Password;
+            user.Email = model.Email;
+            user.ID = model.ID;
+            user.CreationTime = model.CreationTime;
+            
+            return user;
+        }
+
+        public UserViewModel UserToModel(User user)
+        {
+            UserViewModel model = new UserViewModel();
+            model.Name = user.Name;
+            model.Age = user.Age;
+            model.Email = user.Email;
+            model.CreationTime = user.CreationTime;
+            model.ID = user.ID;
+            model.Login = user.Login;
+            model.Password = user.Password;
+            model.Surname = user.Surname;
+            
+            return model;
+        }
+        
+        public PersonalPageViewModel UserToPersonalModel(User user)
+        {
+            PersonalPageViewModel model = new PersonalPageViewModel();
+            model.Name = user.Name;
+            model.Age = user.Age;
+            model.Email = user.Email;
+            model.CreationTime = user.CreationTime;
+            model.ID = user.ID;
+            model.OutputMessages = FindOutputMessages(user);
+            model.InputMessages = FindInputMessages(user);
+
+            return model;
+        }
+
+        public DeleteUserViewModel UserToDeleteModel(User user)
+        {
+            DeleteUserViewModel model = new DeleteUserViewModel();
+            model.Name = user.Name;
+            model.ID = user.ID;
+
+            return model;
+        }
+              
+
+        public List<Message> FindInputMessages(User user)
+        {
+
+            List<Message> myInputMessages = new List<Message>();
+
+
+            using (BlogContext db = new BlogContext())
+            {
+                foreach (var item in db.MessageToUsers)
+                {
+                    if (item.UserTo.ID == user.ID)
                     {
-                        if (user.Login == item.Login)
+                        foreach (var msg in db.Messages)
                         {
-                            ModelState.AddModelError("Login", "This login already exists");
-                            return;
-                        }
-                        if (user.Password == item.Password)
-                        {
-                            ModelState.AddModelError("Password", "This password already exists");
-                            return;
-                        }
-                        if (user.Email == item.Email)
-                        {
-                            ModelState.AddModelError("Email", "This e-mail already exists");
-                            return;
+                            if (item.Message.ID == msg.ID)
+                            {
+                                myInputMessages.Add(msg);
+                            }
                         }
                     }
 
                 }
-
-
             }
-
+            return myInputMessages;
 
         }
+        public List<Message> FindOutputMessages(User user)
+        {
+
+
+            List<Message> myOutputMessages = new List<Message>();
+
+            using (BlogContext db = new BlogContext())
+            {
+                foreach (var item in db.MessageToUsers)
+                {
+                    if (item.UserFrom.ID == user.ID)
+                    {
+                        foreach (var msg in db.Messages)
+                        {
+                            if (item.Message.ID == msg.ID)
+                            {
+                                myOutputMessages.Add(msg);
+                            }
+                        }
+                    }
+
+                }
+            }
+            return myOutputMessages;
+        }
+
 
     }
 }
