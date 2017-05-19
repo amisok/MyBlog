@@ -154,17 +154,13 @@ namespace ASPApp_Blog.Controllers
             using (BlogContext db = new BlogContext())
             {
                 
-                if (db.Users.Where(u => u.ID != model.ID && u.Login == model.Login)
-                            .Select(u => u)
-                            .Count()>0)
+                if (db.Users.Count(u => u.ID != model.ID && u.Login == model.Login)>0)
                 {
                     ModelState.AddModelError("Login", "This login already exists");
                     return;
                 }
 
-                if (db.Users.Where(u => u.ID != model.ID && u.Email == model.Email)
-                            .Select(u => u)
-                            .Count()>0)
+                if (db.Users.Count(u => u.ID != model.ID && u.Email == model.Email)>0)
                 {
                     ModelState.AddModelError("Email", "This e-mail already exists");
                     return;
