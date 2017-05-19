@@ -13,7 +13,6 @@ namespace ASPApp_Blog.ViewModels
         public Nullable<int> Age { get; set; }
         public string Email { get; set; }
         public System.DateTime CreationTime { get; set; }
-        public List<Message> OutputMessages { get; set; }
-        public List<Message> InputMessages { get; set; }
+       
     }
 }

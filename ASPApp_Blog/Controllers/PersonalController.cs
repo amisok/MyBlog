@@ -122,6 +122,23 @@ namespace ASPApp_Blog.Controllers
             }
         }
 
+        
+        public ActionResult MyMessageList(int id)
+        {
+            User user = FindReturnUser(id);
+            if (user == null)
+            {
+                return HttpNotFound();
+            }
+
+            MyMessaseListViewModel model = new MyMessaseListViewModel();
+            model.ID = user.ID;
+            model.InputMessage = FindInputMessages(user);
+            model.OutputMessage = FindOutputMessages(user);
+            return View(model);
+        }
+
+
         public User FindReturnUser(int id)
         {
             using (BlogContext db = new BlogContext())
@@ -195,9 +212,7 @@ namespace ASPApp_Blog.Controllers
             model.Email = user.Email;
             model.CreationTime = user.CreationTime;
             model.ID = user.ID;
-            model.OutputMessages = FindOutputMessages(user);
-            model.InputMessages = FindInputMessages(user);
-
+           
             return model;
         }
 
@@ -211,54 +226,83 @@ namespace ASPApp_Blog.Controllers
         }
               
 
-        public List<Message> FindInputMessages(User user)
+        public List<MyMessage> FindInputMessages(User user)
         {
 
-            List<Message> myInputMessages = new List<Message>();
+            List<MyMessage> myInputMessages = new List<MyMessage>();
 
 
             using (BlogContext db = new BlogContext())
             {
+               
                 foreach (var item in db.MessageToUsers)
                 {
+                    MyMessage myMassege = new MyMessage();
+                    
                     if (item.UserTo.ID == user.ID)
                     {
+                        myMassege.UserToID = user.ID;
+                        myMassege.UserFromID = item.UserFrom.ID;
+                        foreach (var u in db.Users)
+                        {
+                            if (item.UserFrom.ID==u.ID)
+                            {
+                                myMassege.UserFromName = u.Name;
+                                myMassege.UserFromSurname = u.Surname;
+                            }
+                        }
                         foreach (var msg in db.Messages)
                         {
                             if (item.Message.ID == msg.ID)
                             {
-                                myInputMessages.Add(msg);
+                                myMassege.Text = msg.Text;
+                                myMassege.CreationTime = msg.CreationTime;
+                                myInputMessages.Add(myMassege);
                             }
                         }
                     }
-
+                    
                 }
+                
             }
             return myInputMessages;
 
         }
-        public List<Message> FindOutputMessages(User user)
+        public List<MyMessage> FindOutputMessages(User user)
         {
-
-
-            List<Message> myOutputMessages = new List<Message>();
-
+            List<MyMessage> myOutputMessages = new List<MyMessage>();
+            
             using (BlogContext db = new BlogContext())
             {
                 foreach (var item in db.MessageToUsers)
                 {
+                    MyMessage myMassege = new MyMessage();
+                   
                     if (item.UserFrom.ID == user.ID)
                     {
+                        myMassege.UserFromID = user.ID;
+                        myMassege.UserToID = item.UserTo.ID;
+                        foreach (var u in db.Users)
+                        {
+                            if (item.UserTo.ID == u.ID)
+                            {
+                                myMassege.UserToName = u.Name;
+                                myMassege.UserToSurname = u.Surname;
+                            }
+                        }
                         foreach (var msg in db.Messages)
                         {
                             if (item.Message.ID == msg.ID)
                             {
-                                myOutputMessages.Add(msg);
+                                myMassege.Text = msg.Text;
+                                myMassege.CreationTime = msg.CreationTime;
+                                myOutputMessages.Add(myMassege);
                             }
                         }
                     }
-
+                    
                 }
+                
             }
             return myOutputMessages;
         }

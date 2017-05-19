@@ -1,0 +1,58 @@
+﻿@model ASPApp_Blog.ViewModels.MyMessaseListViewModel
+@{
+    ViewBag.Title = "My Messages";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles
+{
+    <style>
+        
+        #time {
+            font-size: 12px;
+        }
+
+        #text {
+            font-size: 18px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+}
+
+<body>
+    <p></p>
+<h3>My messages</h3>   
+    <p></p>
+    <b>@Html.ActionLink("Back to My Page", "PersonalPage", new { id = Model.ID })</b>
+    <p></p>
+    <p></p>
+    <div class="row">
+        <div class="col-md-6">
+            <h4><i><b>Input messages:</b></i></h4>
+            <p></p>
+            @foreach (var item in Model.InputMessage)
+            {
+                <p>From: <b>@Html.DisplayFor(modelItem => item.UserFromName)  @Html.DisplayFor(modelItem => item.UserFromSurname)</b></p>
+                <p id="text"><i>@item.Text</i></p>
+                <p></p>
+                <p id="time"><b><i>@item.CreationTime.ToString()</i>  |  @Html.ActionLink("Send message", "Create","Message", new { userFromID = item.UserToID, userToID = item.UserFromID },null) </b> </p>
+                <p></p>
+                <p>____________________________</p>
+                <p></p>
+            }
+        </div>
+        <div class="col-md-6">
+            <h4><i><b>Output messages:</b></i></h4>
+            <p></p>
+            @foreach (var item in Model.OutputMessage)
+            { <p>To: <b>@Html.DisplayFor(modelItem => item.UserToName)   @Html.DisplayFor(modelItem => item.UserToSurname)</b></p>
+            <p id="text"><i>@item.Text</i></p>
+            <p></p>
+            <p id="time"><b><i>@item.CreationTime.ToString()</i> | @Html.ActionLink("Send message", "Create", "Message", new { userFromID = item.UserFromID, userToID = item.UserToID },null) </b> </p>
+            <p></p>
+            <p>____________________________</p>
+            <p></p>
+            }
+        </div>
+    </div>
+</body>

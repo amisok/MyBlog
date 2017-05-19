@@ -4,49 +4,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section styles
-{
 
-    <style>
-        .blok1, .blok2 {
-            border-radius: 4px;
-            box-shadow: rgba(0,0,0,1.2) 0px 1px 3px;
-        }
-
-        .blok1 {
-            margin: 0px 3px 3px 3px;
-            background: #e5e3e3;
-            width: 150px;
-            min-height: 500px;
-            padding: 5px;
-            text-align: left;
-            float: left;
-        }
-
-        .blok2 {
-            margin: 3px;
-            background: #e5e3e3;
-            width: 1000px;
-            height: 500px;
-            padding: 5px 5px 5px 170px;
-            text-align: left;
-            clear: right;
-        }
-
-        #time{
-            font-size:10px; 
-        }
-        #text{
-            font-size:16px; 
-            font-family:'Times New Roman', Times, serif
-        }
-    </style>
-}
 <html>
 <body>
-
-    <div>
-        <div class="blok1">
+    <p></p>
+    <div class="row">
+        <div class="col-md-2">
             <img class="picture"
                  src="~/images/picture.jpg"
                  align="middle" width=140 height=140
@@ -57,35 +20,20 @@
             <i>e-mail: @Model.Email </i><br />
             <i>@Model.CreationTime </i><br />
             <p></p>
-            <p></p>           
+           
+        </div>
+        <div class="col-md-10">
+            <h4>Menu:</h4>
+            <p></p>
+            <p></p>
             <b><i>@Html.ActionLink("Edit personal data", "Edit", "Personal", new { id = Model.ID }, null)</i></b>
             <p></p>
             <p></p>
+            <b><i>@Html.ActionLink("My messages", "MyMessageList", "Personal", new { id = Model.ID }, null)</i></b>
+            <p></p>
+            <p></p>
             <b><i>@Html.ActionLink("New message", "UsersList", "Message", new { id = Model.ID }, null)</i></b>
-            
-        </div>
-        <div class="blok2">
-            <h4>Input messages:</h4>
-            <p></p>
-            @foreach (var item in Model.InputMessages)
-            {
-                <p id="text"><i>@item.Text</i></p>
-                <p></p>
-                <p id="time"><b><i>@item.CreationTime.ToString()</i></b></p>
-                <p></p>
-                <p></p>
-            }
-            <h4>Output messages:</h4>
-            <p></p>
-            @foreach (var item in Model.OutputMessages)
-            {
-                <p id="text"><i>@item.Text</i></p>
-                <p></p>
-                <p id="time"><b><i>@item.CreationTime.ToString()</i></b></p>
-                <p></p>
-                <p></p>
-            }
-
+          
         </div>
     </div>
 </body>

@@ -39,9 +39,7 @@ namespace ASPApp_Blog.Controllers
             }
 
         }
-
-
-
+        
         [HttpGet]
         public ActionResult Create(int userFromID, int userToID)
         {
