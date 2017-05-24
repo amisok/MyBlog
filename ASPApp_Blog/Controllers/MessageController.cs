@@ -23,21 +23,16 @@ namespace ASPApp_Blog.Controllers
                 {
                     return HttpNotFound();
                 }
-                forMessage.SenderID = user.ID;
-                foreach (var item in db.Users)
-                {
-                    if (item.ID!=user.ID)
-                    {
-                        UserForMessage userForMessage = new UserForMessage();
-                        userForMessage.ID = item.ID;
-                        userForMessage.Name = item.Name;
-                        userForMessage.Surname = item.Surname;
-                        forMessage.Users.Add(userForMessage);
-                    }
-                }
-                return View(forMessage);
-            }
 
+
+                var temp = db.Users.Where(item => item.ID != user.ID)
+                                   .Select(u => new UserForMessage { ID = u.ID,
+                                                                     Name = u.Name,
+                                                                     Surname = u.Surname});
+                forMessage.SenderID = user.ID;
+                forMessage.Users.AddRange(temp);
+            }
+            return View(forMessage);
         }
         
         [HttpGet]
@@ -57,15 +52,13 @@ namespace ASPApp_Blog.Controllers
                 model.UserToID = userTo.ID;
                 model.UserToName = userTo.Name;
                 model.UserToSurname = userTo.Surname;
-                return View(model);
+                
             }
-            
+            return View(model);
         }
         [HttpPost]
         public ActionResult CreateMessage( int userFromID, int userToID, string text)
         {
-
-
             Message message = new Message();
             message.CreationTime = DateTime.Now;
             message.Text = text;

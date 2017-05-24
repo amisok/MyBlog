@@ -32,9 +32,7 @@ namespace ASPApp_Blog.Controllers
                     db.Users.Add(user);
                     db.SaveChanges();
                     return RedirectToAction("PersonalPage", new { id = user.ID });
-
                 }
-
                 return View(model);
             }
         }
@@ -75,9 +73,7 @@ namespace ASPApp_Blog.Controllers
                     db.Entry(user).State = EntityState.Modified;
                     db.SaveChanges();
                     return RedirectToAction("PersonalPage", new { id = user.ID });
-
                 }
-
                 return View(model);
             }
         }
@@ -101,7 +97,7 @@ namespace ASPApp_Blog.Controllers
         {
             using (BlogContext db = new BlogContext())
             {
-                User user = db.Users.Find(id);
+                User user = FindReturnUser(id);
                 if (user == null)
                 {
                     return HttpNotFound();
@@ -139,7 +135,7 @@ namespace ASPApp_Blog.Controllers
         }
 
 
-        public User FindReturnUser(int id)
+        private User FindReturnUser(int id)
         {
             using (BlogContext db = new BlogContext())
             {
@@ -149,18 +145,18 @@ namespace ASPApp_Blog.Controllers
             }
         }
 
-        public void CheckField(UserViewModel model)
+        private void CheckField(UserViewModel model)
         {
             using (BlogContext db = new BlogContext())
             {
                 
-                if (db.Users.Count(u => u.ID != model.ID && u.Login == model.Login)>0)
+                if (db.Users.Count(u => u.ID != model.ID && u.Login == model.Login) > 0)
                 {
                     ModelState.AddModelError("Login", "This login already exists");
                     return;
                 }
 
-                if (db.Users.Count(u => u.ID != model.ID && u.Email == model.Email)>0)
+                if (db.Users.Count(u => u.ID != model.ID && u.Email == model.Email) > 0)
                 {
                     ModelState.AddModelError("Email", "This e-mail already exists");
                     return;
@@ -170,7 +166,7 @@ namespace ASPApp_Blog.Controllers
 
         }
 
-        public User ModelToUser(UserViewModel model)
+        private User ModelToUser(UserViewModel model)
         {
             User user = new User();
             user.Age = model.Age;
@@ -185,7 +181,7 @@ namespace ASPApp_Blog.Controllers
             return user;
         }
 
-        public UserViewModel UserToModel(User user)
+        private UserViewModel UserToModel(User user)
         {
             UserViewModel model = new UserViewModel();
             model.Name = user.Name;
@@ -199,8 +195,8 @@ namespace ASPApp_Blog.Controllers
             
             return model;
         }
-        
-        public PersonalPageViewModel UserToPersonalModel(User user)
+
+        private PersonalPageViewModel UserToPersonalModel(User user)
         {
             PersonalPageViewModel model = new PersonalPageViewModel();
             model.Name = user.Name;
@@ -212,7 +208,7 @@ namespace ASPApp_Blog.Controllers
             return model;
         }
 
-        public DeleteUserViewModel UserToDeleteModel(User user)
+        private DeleteUserViewModel UserToDeleteModel(User user)
         {
             DeleteUserViewModel model = new DeleteUserViewModel();
             model.Name = user.Name;
@@ -220,85 +216,40 @@ namespace ASPApp_Blog.Controllers
 
             return model;
         }
-              
 
-        public List<MyMessage> FindInputMessages(User user)
+
+        private IEnumerable<MyMessage> FindInputMessages(User user)
         {
 
             List<MyMessage> myInputMessages = new List<MyMessage>();
-
-
+            
             using (BlogContext db = new BlogContext())
             {
-               
-                foreach (var item in db.MessageToUsers)
-                {
-                    MyMessage myMassege = new MyMessage();
-                    
-                    if (item.UserTo.ID == user.ID)
-                    {
-                        myMassege.UserToID = user.ID;
-                        myMassege.UserFromID = item.UserFrom.ID;
-                        foreach (var u in db.Users)
-                        {
-                            if (item.UserFrom.ID==u.ID)
-                            {
-                                myMassege.UserFromName = u.Name;
-                                myMassege.UserFromSurname = u.Surname;
-                            }
-                        }
-                        foreach (var msg in db.Messages)
-                        {
-                            if (item.Message.ID == msg.ID)
-                            {
-                                myMassege.Text = msg.Text;
-                                myMassege.CreationTime = msg.CreationTime;
-                                myInputMessages.Add(myMassege);
-                            }
-                        }
-                    }
-                    
-                }
+                var temp = db.MessageToUsers
+                    .Where(mtu => mtu.UserTo.ID == user.ID)
+                    .ToList()   
+                    .Select(mtu => new MyMessage(mtu))
+                    .OrderByDescending(m=>m.CreationTime);
                 
+                myInputMessages.AddRange(temp);
             }
             return myInputMessages;
 
         }
-        public List<MyMessage> FindOutputMessages(User user)
+
+        private IEnumerable<MyMessage> FindOutputMessages(User user)
         {
             List<MyMessage> myOutputMessages = new List<MyMessage>();
             
             using (BlogContext db = new BlogContext())
             {
-                foreach (var item in db.MessageToUsers)
-                {
-                    MyMessage myMassege = new MyMessage();
-                   
-                    if (item.UserFrom.ID == user.ID)
-                    {
-                        myMassege.UserFromID = user.ID;
-                        myMassege.UserToID = item.UserTo.ID;
-                        foreach (var u in db.Users)
-                        {
-                            if (item.UserTo.ID == u.ID)
-                            {
-                                myMassege.UserToName = u.Name;
-                                myMassege.UserToSurname = u.Surname;
-                            }
-                        }
-                        foreach (var msg in db.Messages)
-                        {
-                            if (item.Message.ID == msg.ID)
-                            {
-                                myMassege.Text = msg.Text;
-                                myMassege.CreationTime = msg.CreationTime;
-                                myOutputMessages.Add(myMassege);
-                            }
-                        }
-                    }
-                    
-                }
-                
+                var temp = db.MessageToUsers
+                    .Where(mtu => mtu.UserFrom.ID == user.ID)
+                    .ToList()
+                    .Select(mtu => new MyMessage(mtu))
+                    .OrderByDescending(m=>m.CreationTime);
+
+                myOutputMessages.AddRange(temp);
             }
             return myOutputMessages;
         }

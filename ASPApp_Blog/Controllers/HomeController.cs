@@ -42,9 +42,8 @@ namespace ASPApp_Blog.Controllers
                 }
                 ModelState.AddModelError("Login", "There is no such user. Please register");
                 return View("Index");
-
             }
-  
+            
         }
        
     }
