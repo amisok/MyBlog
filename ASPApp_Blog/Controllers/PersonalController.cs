@@ -112,6 +112,7 @@ namespace ASPApp_Blog.Controllers
                     db.Messages.Remove(item.Message);
                     db.MessageToUsers.Remove(item);
                 }
+                db.Users.Attach(user);
                 db.Users.Remove(user);
                 db.SaveChanges();
                 return RedirectToAction("Index", "Home");
