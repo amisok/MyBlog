@@ -22,7 +22,7 @@ namespace ASPApp_Blog.Controllers
         [HttpPost]
         public ActionResult Registration(UserViewModel model)
         {
-            CheckField(model);
+            //CheckField(model);
             using (BlogContext db = new BlogContext())
             {
                 if (ModelState.IsValid)
@@ -64,7 +64,7 @@ namespace ASPApp_Blog.Controllers
         public ActionResult Edit(UserViewModel model)
         {
             
-            CheckField(model);
+           // CheckField(model);
             using (BlogContext db = new BlogContext())
             {
                 if (ModelState.IsValid)
@@ -136,6 +136,36 @@ namespace ASPApp_Blog.Controllers
         }
 
 
+        public JsonResult ValidateEmail(string Email, int ID=0)
+        {
+            using (BlogContext db = new BlogContext())
+            {
+                if (db.Users.Count(u => u.ID != ID && u.Email == Email) > 0)
+                {
+                    return Json("This e-mail already exists",JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(true, JsonRequestBehavior.AllowGet);
+                }
+            }
+        }
+
+        public JsonResult ValidateLogin(string Login, int ID=0)
+        {
+            using (BlogContext db = new BlogContext())
+            {
+                if (db.Users.Count(u => u.ID != ID && u.Login == Login) > 0)
+                {
+                    return Json("This login already exists", JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(true, JsonRequestBehavior.AllowGet);
+                }
+            }
+        }
+        
         private User FindReturnUser(int id)
         {
             using (BlogContext db = new BlogContext())
@@ -146,26 +176,26 @@ namespace ASPApp_Blog.Controllers
             }
         }
 
-        private void CheckField(UserViewModel model)
-        {
-            using (BlogContext db = new BlogContext())
-            {
-                
-                if (db.Users.Count(u => u.ID != model.ID && u.Login == model.Login) > 0)
-                {
-                    ModelState.AddModelError("Login", "This login already exists");
-                    return;
-                }
+        //private void CheckField(UserViewModel model)
+        //{
+            //using (BlogContext db = new BlogContext())
+            //{
 
-                if (db.Users.Count(u => u.ID != model.ID && u.Email == model.Email) > 0)
-                {
-                    ModelState.AddModelError("Email", "This e-mail already exists");
-                    return;
-                }
+                //if (db.Users.Count(u => u.ID != model.ID && u.Login == model.Login) > 0)
+                //{
+                //    ModelState.AddModelError("Login", "This login already exists");
+                //    return;
+                //}
 
-            }
+                //if (db.Users.Count(u => u.ID != model.ID && u.Email == model.Email) > 0)
+                //{
+                //    ModelState.AddModelError("Email", "This e-mail already exists");
+                //    return;
+                //}
 
-        }
+            //}
+
+       // }
 
         private User ModelToUser(UserViewModel model)
         {

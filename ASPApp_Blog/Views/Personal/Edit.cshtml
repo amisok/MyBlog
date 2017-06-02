@@ -4,13 +4,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <html>
 <body>
+    
         @using (Html.BeginForm("Edit", "Personal", FormMethod.Post))
         {
-            @Html.ValidationSummary(true)
-
             <fieldset>
                 <legend>User</legend>
                 @Html.HiddenFor(model => model.ID)
@@ -59,7 +57,7 @@
                     @Html.LabelFor(model => model.Password)
                 </div>
                 <div>
-                    @Html.EditorFor(model => model.Password)
+                    @Html.PasswordFor(model => model.Password)
                     @Html.ValidationMessageFor(model => model.Password)
                 </div>
                 <p></p>
@@ -67,10 +65,13 @@
                     @Html.LabelFor(model => model.PasswordConfirm)
                 </div>
                 <div>
-                    @Html.EditorFor(model => model.PasswordConfirm)
+                    @Html.PasswordFor(model => model.PasswordConfirm)
                     @Html.ValidationMessageFor(model => model.PasswordConfirm)
                 </div>
                 <p></p>
+
+                @Html.ValidationSummary(true)
+
                 <p>
                     <input type="submit" value="Save" />
                 </p>
